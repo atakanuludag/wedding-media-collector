@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Loader2, RefreshCw } from "lucide-react";
+import { ArrowRight, Loader2, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { MediaLightbox } from "@/components/MediaLightbox";
 import { MediaTile } from "@/components/MediaTile";
@@ -79,10 +79,19 @@ export function MediaGallery({ refreshToken = 0 }: MediaGalleryProps) {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-stone-800">
-          Paylaşılan Anılar
-        </h2>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <h2 className="text-lg font-semibold text-stone-800">
+            Paylaşılan Anılar
+          </h2>
+          <Link
+            href="/gallery"
+            className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-3 py-1 text-xs font-medium text-orange-700 transition-colors hover:bg-orange-200"
+          >
+            Tümünü göster
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
         <button
           type="button"
           onClick={() => void fetchMedia()}
@@ -98,6 +107,7 @@ export function MediaGallery({ refreshToken = 0 }: MediaGalleryProps) {
           <MediaTile
             key={item.key}
             item={item}
+            hideVideoPreview={selectedItem !== null && item.kind === "video"}
             onClick={() => setSelectedItem(item)}
           />
         ))}

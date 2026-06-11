@@ -113,7 +113,7 @@ export function GalleryPage() {
                 <MediaTile
                   item={item}
                   aspectSquare={false}
-                  showDate
+                  hideVideoPreview={selectedItem !== null && item.kind === "video"}
                   onClick={() => setSelectedItem(item)}
                 />
               </div>

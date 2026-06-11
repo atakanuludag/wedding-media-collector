@@ -1,8 +1,8 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useEffect } from "react";
-import { formatMediaDate } from "@/lib/media-api";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import type { MediaItem } from "@/types/upload";
 
 interface MediaLightboxProps {
@@ -11,6 +11,12 @@ interface MediaLightboxProps {
 }
 
 export function MediaLightbox({ item, onClose }: MediaLightboxProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (!item) return;
 
@@ -19,21 +25,21 @@ export function MediaLightbox({ item, onClose }: MediaLightboxProps) {
     };
 
     document.body.style.overflow = "hidden";
+    document.body.dataset.lightboxOpen = "true";
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.body.style.overflow = "";
+      delete document.body.dataset.lightboxOpen;
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [item, onClose]);
 
-  if (!item) return null;
+  if (!item || !mounted) return null;
 
-  const formattedDate = formatMediaDate(item.lastModified);
-
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
       aria-label={item.kind === "video" ? "Video oynatıcı" : "Fotoğraf önizleme"}
@@ -74,11 +80,8 @@ export function MediaLightbox({ item, onClose }: MediaLightboxProps) {
             />
           )}
         </div>
-
-        {formattedDate && (
-          <p className="mt-4 text-sm text-white/80">{formattedDate}</p>
-        )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -7,6 +7,7 @@ interface MediaTileProps {
   className?: string;
   aspectSquare?: boolean;
   showDate?: boolean;
+  hideVideoPreview?: boolean;
   onClick?: () => void;
 }
 
@@ -15,6 +16,7 @@ export function MediaTile({
   className = "",
   aspectSquare = true,
   showDate = false,
+  hideVideoPreview = false,
   onClick,
 }: MediaTileProps) {
   const formattedDate = formatMediaDate(item.lastModified);
@@ -24,13 +26,20 @@ export function MediaTile({
     <>
       {item.kind === "video" ? (
         <>
-          <video
-            src={item.url}
-            className={`w-full object-cover ${aspectSquare ? "h-full" : "h-auto"}`}
-            muted
-            playsInline
-            preload="metadata"
-          />
+          {hideVideoPreview ? (
+            <div
+              className={`w-full bg-stone-200 ${aspectSquare ? "h-full" : "aspect-video"}`}
+            />
+          ) : (
+            <video
+              data-tile-video
+              src={item.url}
+              className={`w-full object-cover ${aspectSquare ? "h-full" : "h-auto"}`}
+              muted
+              playsInline
+              preload="metadata"
+            />
+          )}
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-md">
               <Film className="h-5 w-5 text-orange-600" />

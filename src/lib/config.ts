@@ -1,6 +1,11 @@
 export const appConfig = {
   title: process.env.NEXT_PUBLIC_APP_TITLE ?? "Hande & Cengiz Nişan",
   themeColor: process.env.NEXT_PUBLIC_THEME_COLOR ?? "orange",
+  siteUrl:
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    "https://wedding-media-collector.vercel.app",
+  description:
+    "Nişan günümüzün fotoğraf ve videolarını anında paylaşın. Giriş gerekmez.",
 } as const;
 
 export const uploadConfig = {

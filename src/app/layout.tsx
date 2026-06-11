@@ -14,9 +14,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(appConfig.siteUrl),
   title: appConfig.title,
-  description:
-    "Nişan günümüzün fotoğraf ve videolarını anında paylaşın. Giriş gerekmez.",
+  description: appConfig.description,
+  openGraph: {
+    title: appConfig.title,
+    description: appConfig.description,
+    url: appConfig.siteUrl,
+    siteName: appConfig.title,
+    locale: "tr_TR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: appConfig.title,
+    description: appConfig.description,
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
