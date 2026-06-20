@@ -14,6 +14,9 @@ import type { UploadItem } from "@/types/upload";
 const ACCEPT =
   "image/jpeg,image/png,image/webp,image/heic,image/heif,video/mp4,video/quicktime,video/webm,video/x-msvideo";
 
+const IMAGE_ACCEPT =
+  "image/jpeg,image/png,image/webp,image/heic,image/heif";
+
 function uploadWithProgress(
   file: File,
   onProgress: (progress: number) => void,
@@ -56,7 +59,9 @@ interface UploadZoneProps {
 }
 
 export function UploadZone({ onUploadComplete }: UploadZoneProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const suppressGalleryClickRef = useRef(false);
   const [items, setItems] = useState<UploadItem[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -120,6 +125,29 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
     [processFiles],
   );
 
+  const handleFileInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (event.target.files) {
+        processFiles(event.target.files);
+        event.target.value = "";
+      }
+    },
+    [processFiles],
+  );
+
+  const openGallery = useCallback(() => {
+    if (suppressGalleryClickRef.current) return;
+    galleryInputRef.current?.click();
+  }, []);
+
+  const openCamera = useCallback(() => {
+    suppressGalleryClickRef.current = true;
+    cameraInputRef.current?.click();
+    window.setTimeout(() => {
+      suppressGalleryClickRef.current = false;
+    }, 500);
+  }, []);
+
   const completedCount = items.filter((item) => item.status === "success").length;
   const hasActiveUploads = items.some(
     (item) => item.status === "pending" || item.status === "uploading",
@@ -130,11 +158,11 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
       <div
         role="button"
         tabIndex={0}
-        onClick={() => inputRef.current?.click()}
+        onClick={openGallery}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
-            inputRef.current?.click();
+            openGallery();
           }
         }}
         onDragOver={(event) => {
@@ -150,18 +178,12 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
         }`}
       >
         <input
-          ref={inputRef}
+          ref={galleryInputRef}
           type="file"
           accept={ACCEPT}
           multiple
-          capture="environment"
           className="hidden"
-          onChange={(event) => {
-            if (event.target.files) {
-              processFiles(event.target.files);
-              event.target.value = "";
-            }
-          }}
+          onChange={handleFileInputChange}
         />
 
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-100 text-orange-600 transition-transform group-hover:scale-105">
@@ -185,6 +207,25 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
             Video
           </span>
         </div>
+      </div>
+
+      <div className="flex justify-center">
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept={IMAGE_ACCEPT}
+          capture="environment"
+          className="hidden"
+          onChange={handleFileInputChange}
+        />
+        <button
+          type="button"
+          onClick={openCamera}
+          className="inline-flex items-center gap-1.5 rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-medium text-orange-700 transition-colors hover:bg-orange-50"
+        >
+          <Camera className="h-4 w-4" />
+          Fotoğraf çek
+        </button>
       </div>
 
       {items.length > 0 && (
