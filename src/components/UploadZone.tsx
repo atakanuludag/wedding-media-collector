@@ -8,7 +8,8 @@ import {
   Upload,
   XCircle,
 } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { UploadSuccessModal } from "@/components/UploadSuccessModal";
 import type { UploadItem } from "@/types/upload";
 
 const ACCEPT =
@@ -57,8 +58,10 @@ interface UploadZoneProps {
 
 export function UploadZone({ onUploadComplete }: UploadZoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const batchSucceededRef = useRef(false);
   const [items, setItems] = useState<UploadItem[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const updateItem = useCallback(
     (id: string, patch: Partial<UploadItem>) => {
@@ -79,6 +82,7 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
         });
 
         updateItem(item.id, { status: "success", progress: 100 });
+        batchSucceededRef.current = true;
         onUploadComplete?.();
       } catch (error) {
         updateItem(item.id, {
@@ -95,6 +99,8 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
     (fileList: FileList | File[]) => {
       const files = Array.from(fileList);
       if (files.length === 0) return;
+
+      batchSucceededRef.current = false;
 
       const newItems: UploadItem[] = files.map((file) => ({
         id: crypto.randomUUID(),
@@ -134,6 +140,13 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
   const hasActiveUploads = items.some(
     (item) => item.status === "pending" || item.status === "uploading",
   );
+
+  useEffect(() => {
+    if (!hasActiveUploads && batchSucceededRef.current) {
+      setShowSuccessModal(true);
+      batchSucceededRef.current = false;
+    }
+  }, [hasActiveUploads, items]);
 
   return (
     <div className="space-y-4">
@@ -243,6 +256,10 @@ export function UploadZone({ onUploadComplete }: UploadZoneProps) {
           </ul>
         </div>
       )}
+      <UploadSuccessModal
+        open={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+      />
     </div>
   );
 }

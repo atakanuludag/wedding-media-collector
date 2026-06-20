@@ -52,9 +52,9 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} min-h-dvh antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-stone-50 text-stone-900">
+      <body className="min-h-dvh flex flex-col bg-gradient-to-br from-orange-50 via-amber-50 to-rose-50 text-stone-900">
         {children}
       </body>
     </html>

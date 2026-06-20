@@ -30,4 +30,6 @@ export const uploadConfig = {
 export const galleryConfig = {
   /** Ana sayfada gösterilecek maksimum hücre sayısı (fazlası +N ile) */
   homePreviewLimit: 12,
+  /** Paylaşılan Anılar önizlemesi ve /gallery sayfası */
+  showGallery: process.env.NEXT_PUBLIC_SHOW_GALLERY === "true",
 } as const;
